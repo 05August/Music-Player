@@ -7,6 +7,8 @@ const cdThumbDashboard = $('.cd-thumb');
 const audio = $('#audio');
 const playBtn = $('.btn-toggle-play');
 const progress = $('#progress');
+const nextBtn = $('.btn-next');
+const prevBtn = $('.btn-prev');
 
 
 const app = {
@@ -127,6 +129,16 @@ const app = {
     const cdWidth = cd.offsetWidth;
     const _this = this;
     // const isPlaying = false;
+
+    //Xử lý CD quay và dừng
+    const cdThumbAnimate = cdThumbDashboard.animate([
+      { transform: 'rotate(360deg)' }
+    ], {
+      duration: 10000,
+      iterations: Infinity
+    })
+
+    cdThumbAnimate.pause();
     //Xử lý phóng to thu nhỏ CD
     document.onscroll = function () {
       const scrollTop = window.scrollY || document.documentElement.scrollTop;
@@ -146,41 +158,72 @@ const app = {
 
     }
 
-
     //Khi bài hát đang dc phát
     audio.onplay = function () {
       _this.isPlaying = true;
       player.classList.add("playing");
+      cdThumbAnimate.play();
     }
 
     //Khi bài hát bị dừng
     audio.onpause = function () {
       player.classList.remove("playing");
       _this.isPlaying = false;
+      cdThumbAnimate.pause();
     }
 
     //Khi tiến độ bài hát thay đổi
     audio.ontimeupdate = function () {
-        if (audio.duration) {
-          const progressValue = (audio.currentTime / audio.duration * 100);
-          progress.value = progressValue;
-        }
+      if (audio.duration) {
+        const progressValue = (audio.currentTime / audio.duration * 100);
+        progress.value = progressValue;
+      }
     }
 
     //Xử lý khi tua bài hát
-    progress.onchange = function () {
+    progress.oninput = function () {
       const seekTime = progress.value * audio.duration / 100;
-      console.log("progress.value event onchange ", progress.value)
       audio.currentTime = seekTime;
+    }
+
+    //Xử lý khi next bài hát
+    nextBtn.onclick = function () {
+      _this.nextSong();
+      if(_this.isPlaying){
+        audio.play();
+      }
+    }
+
+    //Xử lý khi prev bài hát
+    prevBtn.onclick = function () {
+      _this.prevSong();
+      if(_this.isPlaying){
+        audio.play();
+      }
     }
 
   },
   loadCurrentSong: function () {
-
     headingDashboard.textContent = this.currentSong.name;
     cdThumbDashboard.style.backgroundImage = `url(${this.currentSong.image})`;
     audio.src = this.currentSong.path;
+    progress.value = 0;
   },
+  nextSong: function () {
+    this.currentIndex++;
+    if (this.currentIndex >= this.songs.length) {
+      this.currentIndex = 0;
+    }
+    this.loadCurrentSong();
+  },
+  prevSong: function () {
+    this.currentIndex--;
+    if (this.currentIndex < 0) {
+      this.currentIndex = this.songs.length - 1;
+    }
+    this.loadCurrentSong();
+  },
+
   start: function () {
     // render playlist
     this.render();
@@ -195,3 +238,6 @@ const app = {
 }
 
 app.start();
+
+
+
