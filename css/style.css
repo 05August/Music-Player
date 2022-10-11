@@ -16,6 +16,8 @@ body {
 html {
   box-sizing: border-box;
   font-family: "Poppins", sans-serif;
+  scroll-behavior: smooth;
+  user-select: none;
 }
 
 .player {
@@ -148,8 +150,12 @@ header h2 {
   background-color: var(--primary-color);
 }
 
+.song:hover {
+  cursor: pointer;
+}
+
 .song:active {
-  opacity: 0.8;
+  opacity: 0.6;
 }
 
 .song.active .option,
